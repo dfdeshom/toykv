@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 
-	//kv "github.com/dfdeshom/toykv"
 	"github.com/dfdeshom/toykv"
 	"github.com/google/btree"
 )
@@ -14,13 +13,18 @@ type MemTable struct {
 	btree btree.BTree
 }
 
-func (m MemTable) Get(key string) (string, error) {
+func (m MemTable) Get(key string) (string, bool) {
 	k := Entry{Key: key}
 	item := m.btree.Get(k)
 	if item != nil {
-		return item.(Entry).Value, nil
+		return item.(Entry).Value, true
 	}
-	return "", nil
+	return "", false
+}
+
+func (m MemTable) Set(key string, value string) {
+	k := Entry{Key: key, Value: value}
+	m.btree.ReplaceOrInsert(k)
 }
 
 func (a Entry) Less(b btree.Item) bool {
